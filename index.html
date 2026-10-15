@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Tasks</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <main class="app">
+      <header class="app__header">
+        <h1>Tasks</h1>
+        <p class="app__count" id="count">0 open · 0 done</p>
+      </header>
+
+      <form id="form" class="form" autocomplete="off">
+        <input
+          id="input"
+          class="form__input"
+          type="text"
+          placeholder="What needs doing?"
+          maxlength="200"
+          required
+        />
+        <button class="form__add" type="submit">Add</button>
+      </form>
+
+      <ul id="list" class="list" aria-label="Tasks"></ul>
+
+      <footer class="app__footer">
+        <div class="filters" role="tablist" aria-label="Filter tasks">
+          <button class="filters__btn is-active" data-filter="all" type="button">All</button>
+          <button class="filters__btn" data-filter="open" type="button">Open</button>
+          <button class="filters__btn" data-filter="done" type="button">Done</button>
+        </div>
+        <button id="clear-done" class="footer__clear" type="button">Clear done</button>
+      </footer>
+    </main>
+
+    <script src="app.js"></script>
+  </body>
+</html>
