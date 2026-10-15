@@ -167,6 +167,18 @@
 
   filterBtns.forEach((b) => b.addEventListener("click", () => setFilter(b.dataset.filter)));
 
+  // Keyboard shortcuts: "/" focuses input, Escape clears/cancels.
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "/" && document.activeElement !== input) {
+      e.preventDefault();
+      input.focus();
+      input.select();
+    } else if (e.key === "Escape" && document.activeElement === input) {
+      input.value = "";
+      input.blur();
+    }
+  });
+
   // ---------- init ----------
   setFilter(filter); // sync active state
   render();
