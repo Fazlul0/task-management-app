@@ -16,6 +16,7 @@ python3 -m http.server 8000
 - Add, complete, and delete tasks
 - Filter by All / Open / Done
 - "Clear done" bulk action
+- Keyboard shortcuts: `/` focuses the input, `Esc` clears it
 - Tasks and the active filter persist in `localStorage`
 
 ## Files
