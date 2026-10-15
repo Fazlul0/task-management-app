@@ -76,6 +76,20 @@
     render();
   }
 
+  function renameTask(id, text) {
+    const trimmed = text.trim();
+    if (!trimmed) {
+      // Empty rename → remove the task (matches typical inbox behavior).
+      deleteTask(id);
+      return;
+    }
+    const t = tasks.find((t) => t.id === id);
+    if (!t || t.text === trimmed) return;
+    t.text = trimmed;
+    save();
+    render();
+  }
+
   function clearDone() {
     const before = tasks.length;
     tasks = tasks.filter((t) => !t.done);
@@ -113,7 +127,7 @@
             ${t.done ? "checked" : ""}
             aria-label="Mark ${escapeAttr(t.text)} as ${t.done ? "open" : "done"}"
           />
-          <span class="task__label">${escapeHtml(t.text)}</span>
+          <span class="task__label" tabindex="0" title="Double-click to edit">${escapeHtml(t.text)}</span>
           <button class="task__delete" type="button" aria-label="Delete ${escapeAttr(t.text)}">×</button>
         </li>`
       )
@@ -163,9 +177,81 @@
     }
   });
 
+  // Double-click a label to edit. Enter saves, Esc cancels, blur saves.
+  function beginEdit(labelEl, id) {
+    if (labelEl.dataset.editing === "1") return;
+    const li = labelEl.closest(".task");
+    const current = labelEl.textContent;
+    const inputEl = document.createElement("input");
+    inputEl.type = "text";
+    inputEl.className = "task__edit";
+    inputEl.value = current;
+    inputEl.maxLength = 200;
+    inputEl.setAttribute("aria-label", "Edit task");
+
+    labelEl.dataset.editing = "1";
+    labelEl.replaceWith(inputEl);
+    inputEl.focus();
+    inputEl.select();
+
+    let done = false;
+    const finish = (commit) => {
+      if (done) return;
+      done = true;
+      const next = inputEl.value;
+      if (commit) {
+        renameTask(id, next);
+      } else {
+        // Cancel: re-render to restore the original label.
+        render();
+      }
+    };
+
+    inputEl.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") {
+        e.preventDefault();
+        finish(true);
+      } else if (e.key === "Escape") {
+        e.preventDefault();
+        finish(false);
+      }
+    });
+    inputEl.addEventListener("blur", () => finish(true));
+  }
+
+  list.addEventListener("dblclick", (e) => {
+    const label = e.target.closest(".task__label");
+    if (!label) return;
+    const li = label.closest(".task");
+    if (!li) return;
+    beginEdit(label, li.dataset.id);
+  });
+
+  // Keyboard activation: Enter on a focused label begins editing.
+  list.addEventListener("keydown", (e) => {
+    if (e.key !== "Enter") return;
+    const label = e.target.closest(".task__label");
+    if (!label) return;
+    e.preventDefault();
+    const li = label.closest(".task");
+    beginEdit(label, li.dataset.id);
+  });
+
   clearDoneBtn.addEventListener("click", clearDone);
 
   filterBtns.forEach((b) => b.addEventListener("click", () => setFilter(b.dataset.filter)));
+
+  // Keyboard shortcuts: "/" focuses input, Escape clears/cancels.
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "/" && document.activeElement !== input) {
+      e.preventDefault();
+      input.focus();
+      input.select();
+    } else if (e.key === "Escape" && document.activeElement === input) {
+      input.value = "";
+      input.blur();
+    }
+  });
 
   // ---------- init ----------
   setFilter(filter); // sync active state

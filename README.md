@@ -14,8 +14,10 @@ python3 -m http.server 8000
 ## Features
 
 - Add, complete, and delete tasks
+- Edit-in-place: double-click a task (or focus + Enter) to rename
 - Filter by All / Open / Done
 - "Clear done" bulk action
+- Keyboard shortcuts: `/` focuses the input, `Esc` clears it
 - Tasks and the active filter persist in `localStorage`
 
 ## Files
